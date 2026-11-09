@@ -1,0 +1,9 @@
+[workspace]
+members = [
+    "crates/voider-core",
+    "src-tauri",
+]
+default-members = [
+    "crates/voider-core",
+]
+resolver = "2"
