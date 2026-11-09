@@ -129,3 +129,62 @@ export interface DecompiledFunction {
   signature: string;
   code_lines: DecompiledLine[];
 }
+
+// XREFs (Cross References)
+export type XrefType = "Call" | "Data" | "Jump" | "Read" | "Write";
+
+export interface XrefItem {
+  from_address: number;
+  to_address: number;
+  type: XrefType;
+  from_function: string;
+  context_instruction: string;
+}
+
+// Call Graph Hierarchy
+export interface CallGraphNode {
+  function_id: string;
+  name: string;
+  address: number;
+  callers: string[];
+  callees: string[];
+}
+
+// Type & Struct Definitions
+export interface StructMember {
+  name: string;
+  type_name: string;
+  offset: number;
+  size: number;
+  comment?: string;
+}
+
+export interface StructDefinition {
+  id: string;
+  name: string;
+  total_size: number;
+  alignment: number;
+  members: StructMember[];
+}
+
+// Binary Patch Studio
+export interface BinaryPatch {
+  id: string;
+  address: number;
+  original_bytes: string;
+  patched_bytes: string;
+  mnemonic: string;
+  comment?: string;
+  is_active: boolean;
+  timestamp: number;
+}
+
+// Bookmarks & Annotations
+export interface BookmarkItem {
+  id: string;
+  address: number;
+  label: string;
+  color: string;
+  category: string;
+  created_at: string;
+}

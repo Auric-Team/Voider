@@ -3,8 +3,15 @@ import {
   calculateEntropy,
   computeEntropyBlocks,
   extractClientStrings,
-} from "../engine/clientAnalyzer";
-import { SAMPLE_PE, SAMPLE_DECOMPILED } from "../engine/demoSamples";
+} from "../core/analyzer/clientAnalyzer";
+import {
+  SAMPLE_PE,
+  SAMPLE_DECOMPILED,
+  SAMPLE_XREFS,
+  SAMPLE_CALLGRAPH,
+  SAMPLE_STRUCTS,
+  SAMPLE_BOOKMARKS,
+} from "../core/samples/demoSamples";
 
 describe("Voider Core Analysis Tests", () => {
   it("computes zero entropy for uniform zero bytes", () => {
@@ -57,7 +64,38 @@ describe("Voider Core Analysis Tests", () => {
     const mainDecomp = SAMPLE_DECOMPILED["func_entry"];
     expect(mainDecomp).toBeDefined();
     expect(mainDecomp.code_lines.length).toBeGreaterThan(10);
-    expect(mainDecomp.code_lines.some((l) => l.text.includes("check_license_key"))).toBe(true);
-    expect(mainDecomp.code_lines.some((l) => l.address_ref === 0x140001021)).toBe(true);
+    expect(
+      mainDecomp.code_lines.some((l: { text: string }) => l.text.includes("check_license_key"))
+    ).toBe(true);
+    expect(
+      mainDecomp.code_lines.some((l: { address_ref?: number | null }) => l.address_ref === 0x140001021)
+    ).toBe(true);
+  });
+
+  it("validates cross-references (XREFs) data integrity", () => {
+    expect(SAMPLE_XREFS.length).toBeGreaterThanOrEqual(3);
+    const callXref = SAMPLE_XREFS.find((x) => x.type === "Call");
+    expect(callXref).toBeDefined();
+    expect(callXref?.from_function).toBe("main");
+  });
+
+  it("validates call graph hierarchy", () => {
+    expect(SAMPLE_CALLGRAPH.length).toBeGreaterThanOrEqual(3);
+    const mainNode = SAMPLE_CALLGRAPH.find((n) => n.name === "main");
+    expect(mainNode?.callees).toContain("check_license_key");
+  });
+
+  it("validates data types and struct memory alignments", () => {
+    expect(SAMPLE_STRUCTS.length).toBeGreaterThanOrEqual(2);
+    const headerStruct = SAMPLE_STRUCTS[0];
+    expect(headerStruct.name).toBe("LICENSE_HEADER");
+    expect(headerStruct.total_size).toBe(32);
+    expect(headerStruct.members.length).toBe(7);
+  });
+
+  it("validates bookmark manager annotations", () => {
+    expect(SAMPLE_BOOKMARKS.length).toBeGreaterThanOrEqual(4);
+    const entryBm = SAMPLE_BOOKMARKS.find((b) => b.category === "Entry");
+    expect(entryBm?.address).toBe(0x140001000);
   });
 });

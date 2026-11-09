@@ -1,5 +1,5 @@
 import { Cpu } from "lucide-react";
-import type { BinaryInfo } from "../types/binary";
+import type { BinaryInfo } from "../../core/types/binary";
 
 interface StatusBarProps {
   info: BinaryInfo;

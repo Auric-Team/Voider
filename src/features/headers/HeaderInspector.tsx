@@ -1,5 +1,5 @@
 import { Layers, ShieldCheck, Cpu, HardDrive } from "lucide-react";
-import type { BinaryInfo, HeaderField } from "../types/binary";
+import type { BinaryInfo, HeaderField } from "../../core/types/binary";
 
 interface HeaderInspectorProps {
   info: BinaryInfo;

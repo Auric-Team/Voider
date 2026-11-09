@@ -14,7 +14,7 @@ import type {
   ImportItem,
   ExportItem,
   SectionInfo,
-} from "../types/binary";
+} from "../../core/types/binary";
 
 type SidebarTab = "functions" | "strings" | "imports" | "sections";
 

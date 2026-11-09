@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { ZoomIn, ZoomOut, Maximize2, Split } from "lucide-react";
-import type { BasicBlockInfo, FunctionInfo, DisasmInstruction } from "../types/binary";
+import type { BasicBlockInfo, FunctionInfo, DisasmInstruction } from "../../core/types/binary";
 
 interface GraphViewProps {
   currentFunction: FunctionInfo | null;

@@ -9,10 +9,27 @@ import {
   Sparkles,
   Command,
   Download,
+  Link2,
+  GitFork,
+  Boxes,
+  Wrench,
+  Crosshair,
+  Bookmark,
 } from "lucide-react";
-import type { BinaryInfo } from "../types/binary";
+import type { BinaryInfo } from "../../core/types/binary";
 
-export type WorkbenchView = "listing" | "graph" | "decompiler" | "hex" | "headers";
+export type WorkbenchView =
+  | "listing"
+  | "graph"
+  | "decompiler"
+  | "hex"
+  | "headers"
+  | "xrefs"
+  | "callgraph"
+  | "structs"
+  | "patcher"
+  | "search"
+  | "bookmarks";
 
 interface HeaderBarProps {
   currentView: WorkbenchView;
@@ -24,7 +41,7 @@ interface HeaderBarProps {
   onExport: () => void;
 }
 
-export const HeaderBar: React.FC<HeaderBarProps> = ({
+export const HeaderBar = ({
   currentView,
   onSelectView,
   info,
@@ -32,7 +49,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   onLoadSample,
   onOpenCommandPalette,
   onExport,
-}) => {
+}: HeaderBarProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,11 +59,17 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   };
 
   const navItems: { id: WorkbenchView; label: string; icon: React.ReactNode; shortcut: string }[] = [
-    { id: "listing", label: "Disassembly", icon: <FileCode size={16} />, shortcut: "Space" },
-    { id: "graph", label: "Graph (CFG)", icon: <Network size={16} />, shortcut: "Space" },
-    { id: "decompiler", label: "Decompiler (C)", icon: <Code2 size={16} />, shortcut: "F5" },
-    { id: "hex", label: "Hex Editor", icon: <Binary size={16} />, shortcut: "Alt+H" },
-    { id: "headers", label: "Headers", icon: <Layers size={16} />, shortcut: "Alt+E" },
+    { id: "listing", label: "Disassembly", icon: <FileCode size={15} />, shortcut: "Space" },
+    { id: "graph", label: "Graph (CFG)", icon: <Network size={15} />, shortcut: "Space" },
+    { id: "decompiler", label: "Decompiler", icon: <Code2 size={15} />, shortcut: "F5" },
+    { id: "hex", label: "Hex Editor", icon: <Binary size={15} />, shortcut: "Alt+H" },
+    { id: "xrefs", label: "XREFs", icon: <Link2 size={15} />, shortcut: "X" },
+    { id: "callgraph", label: "Call Graph", icon: <GitFork size={15} />, shortcut: "C" },
+    { id: "structs", label: "Structs", icon: <Boxes size={15} />, shortcut: "T" },
+    { id: "patcher", label: "Patch Studio", icon: <Wrench size={15} />, shortcut: "P" },
+    { id: "search", label: "Signature Scan", icon: <Crosshair size={15} />, shortcut: "Alt+S" },
+    { id: "bookmarks", label: "Bookmarks", icon: <Bookmark size={15} />, shortcut: "B" },
+    { id: "headers", label: "Headers", icon: <Layers size={15} />, shortcut: "Alt+E" },
   ];
 
   return (
@@ -66,14 +89,14 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
                 v2.0 PRO
               </span>
             </div>
-            <div className="text-[10px] text-gray-500 font-mono truncate max-w-[180px]">
+            <div className="text-[10px] text-gray-500 font-mono truncate max-w-[140px]">
               {info.filename}
             </div>
           </div>
         </div>
 
         {/* Binary Info Tags */}
-        <div className="hidden lg:flex items-center space-x-1.5 pl-3 border-l border-[#232635]">
+        <div className="hidden xl:flex items-center space-x-1.5 pl-3 border-l border-[#232635]">
           <span className="px-2 py-0.5 rounded bg-[#161822] text-[#00d4ff] font-mono text-[11px] border border-[#2d3145]">
             {info.format}
           </span>
@@ -87,14 +110,14 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
       </div>
 
       {/* Center Navigation Tabs */}
-      <div className="flex items-center bg-[#13141f] p-1 rounded-lg border border-[#232635]">
+      <div className="flex items-center bg-[#13141f] p-1 rounded-lg border border-[#232635] overflow-x-auto max-w-[55vw]">
         {navItems.map((item) => {
           const isActive = currentView === item.id;
           return (
             <button
               key={item.id}
               onClick={() => onSelectView(item.id)}
-              className={`flex items-center space-x-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+              className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
                 isActive
                   ? "bg-gradient-to-r from-cyan-500/20 to-indigo-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm"
                   : "text-gray-400 hover:text-gray-200 hover:bg-[#1a1c2a]"
@@ -102,7 +125,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
             >
               {item.icon}
               <span>{item.label}</span>
-              <kbd className="hidden md:inline-block text-[9px] px-1 py-0.2 rounded bg-black/40 text-gray-500 font-mono">
+              <kbd className="hidden 2xl:inline-block text-[9px] px-1 py-0.2 rounded bg-black/40 text-gray-500 font-mono">
                 {item.shortcut}
               </kbd>
             </button>

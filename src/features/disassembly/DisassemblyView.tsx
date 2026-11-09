@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { MessageSquare, ArrowRight } from "lucide-react";
-import type { DisasmInstruction, FunctionInfo } from "../types/binary";
+import { MessageSquare, ArrowRight, Link2 } from "lucide-react";
+import type { DisasmInstruction, FunctionInfo } from "../../core/types/binary";
 
 interface DisassemblyViewProps {
   instructions: DisasmInstruction[];
@@ -10,9 +10,10 @@ interface DisassemblyViewProps {
   onJumpToAddress: (address: number) => void;
   comments: Record<number, string>;
   onSetComment: (address: number, comment: string) => void;
+  onOpenXrefs?: (address: number) => void;
 }
 
-export const DisassemblyView: React.FC<DisassemblyViewProps> = ({
+export const DisassemblyView = ({
   instructions,
   functions,
   selectedAddress,
@@ -20,7 +21,8 @@ export const DisassemblyView: React.FC<DisassemblyViewProps> = ({
   onJumpToAddress,
   comments,
   onSetComment,
-}) => {
+  onOpenXrefs,
+}: DisassemblyViewProps) => {
   const [editingCommentAddress, setEditingCommentAddress] = useState<number | null>(null);
   const [tempCommentText, setTempCommentText] = useState("");
 
@@ -91,8 +93,20 @@ export const DisassemblyView: React.FC<DisassemblyViewProps> = ({
                 }`}
               >
                 {/* Address Column */}
-                <div className="w-32 text-cyan-500/80 group-hover:text-cyan-400 shrink-0 select-none">
-                  0x{ins.address.toString(16).toUpperCase().padStart(8, "0")}
+                <div className="w-32 text-cyan-500/80 group-hover:text-cyan-400 shrink-0 select-none flex items-center space-x-1.5">
+                  <span>0x{ins.address.toString(16).toUpperCase().padStart(8, "0")}</span>
+                  {onOpenXrefs && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onOpenXrefs(ins.address);
+                      }}
+                      className="opacity-0 group-hover:opacity-100 p-0.5 hover:text-cyan-300 text-gray-600 transition-opacity"
+                      title="Inspect XREFs (X)"
+                    >
+                      <Link2 size={11} />
+                    </button>
+                  )}
                 </div>
 
                 {/* Opcode Hex Bytes */}

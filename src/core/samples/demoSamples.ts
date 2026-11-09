@@ -1,4 +1,11 @@
-import type { BinaryAnalysis, DecompiledFunction } from "../types/binary";
+import type {
+  BinaryAnalysis,
+  DecompiledFunction,
+  XrefItem,
+  CallGraphNode,
+  StructDefinition,
+  BookmarkItem,
+} from "../types/binary";
 
 export const SAMPLE_PE: BinaryAnalysis = {
   info: {
@@ -76,7 +83,7 @@ export const SAMPLE_PE: BinaryAnalysis = {
       is_entry: true,
       calling_convention: "fastcall",
       x_refs_to: [],
-      comment: "Application entry point and license prompt",
+      comment: "Application entry point and license validation loop",
     },
     {
       id: "func_check_key",
@@ -87,11 +94,11 @@ export const SAMPLE_PE: BinaryAnalysis = {
       basic_block_count: 5,
       is_entry: false,
       calling_convention: "fastcall",
-      x_refs_to: [0x140001026],
+      x_refs_to: [0x140001021],
       comment: "Validates user license key checksum algorithm",
     },
     {
-      id: "func_calc_hash",
+      id: "func_calc_crc",
       name: "calculate_crc32",
       start_address: 0x1400010d0,
       end_address: 0x140001130,
@@ -844,3 +851,140 @@ export const SAMPLE_DECOMPILED: Record<string, DecompiledFunction> = {
     ],
   },
 };
+
+// Rich Sample XREFs (Cross References)
+export const SAMPLE_XREFS: XrefItem[] = [
+  {
+    from_address: 0x140001021,
+    to_address: 0x140001050,
+    type: "Call",
+    from_function: "main",
+    context_instruction: "call check_license_key",
+  },
+  {
+    from_address: 0x14000100f,
+    to_address: 0x140007080,
+    type: "Call",
+    from_function: "main",
+    context_instruction: "call printf",
+  },
+  {
+    from_address: 0x140001008,
+    to_address: 0x140006000,
+    type: "Data",
+    from_function: "main",
+    context_instruction: "lea rcx, [\"Enter license key: \"]",
+  },
+  {
+    from_address: 0x14000102b,
+    to_address: 0x140006018,
+    type: "Data",
+    from_function: "main",
+    context_instruction: "lea rcx, [\"ACCESS GRANTED!\"]",
+  },
+  {
+    from_address: 0x140001028,
+    to_address: 0x140001037,
+    type: "Jump",
+    from_function: "main",
+    context_instruction: "jz 0x140001037",
+  },
+];
+
+// Rich Sample Call Graph (Caller/Callee Hierarchy)
+export const SAMPLE_CALLGRAPH: CallGraphNode[] = [
+  {
+    function_id: "func_entry",
+    name: "main",
+    address: 0x140001000,
+    callers: ["__scrt_common_main_seh"],
+    callees: ["printf", "gets_s", "check_license_key", "puts"],
+  },
+  {
+    function_id: "func_check_key",
+    name: "check_license_key",
+    address: 0x140001050,
+    callers: ["main"],
+    callees: ["calculate_crc32", "memcmp", "decrypt_payload"],
+  },
+  {
+    function_id: "func_calc_crc",
+    name: "calculate_crc32",
+    address: 0x1400010d0,
+    callers: ["check_license_key"],
+    callees: [],
+  },
+  {
+    function_id: "func_decrypt",
+    name: "decrypt_payload",
+    address: 0x140001140,
+    callers: ["check_license_key"],
+    callees: ["VirtualAlloc"],
+  },
+];
+
+// Rich Sample Struct Definitions (Data Types Manager)
+export const SAMPLE_STRUCTS: StructDefinition[] = [
+  {
+    id: "struct_license_header",
+    name: "LICENSE_HEADER",
+    total_size: 32,
+    alignment: 8,
+    members: [
+      { name: "magic", type_name: "uint32_t", offset: 0, size: 4, comment: "'VOID' (0x44494F56)" },
+      { name: "version", type_name: "uint16_t", offset: 4, size: 2, comment: "Key version (v2)" },
+      { name: "flags", type_name: "uint16_t", offset: 6, size: 2, comment: "Permission bitmask" },
+      { name: "user_hash", type_name: "uint64_t", offset: 8, size: 8, comment: "User ID hash" },
+      { name: "expiration_ts", type_name: "uint64_t", offset: 16, size: 8, comment: "Epoch timestamp" },
+      { name: "signature_crc32", type_name: "uint32_t", offset: 24, size: 4, comment: "Polynomial CRC" },
+      { name: "_padding", type_name: "uint32_t", offset: 28, size: 4, comment: "Struct alignment" },
+    ],
+  },
+  {
+    id: "struct_pe_image_nt_headers64",
+    name: "IMAGE_NT_HEADERS64",
+    total_size: 264,
+    alignment: 8,
+    members: [
+      { name: "Signature", type_name: "DWORD", offset: 0, size: 4, comment: "'PE\\0\\0'" },
+      { name: "FileHeader", type_name: "IMAGE_FILE_HEADER", offset: 4, size: 20 },
+      { name: "OptionalHeader", type_name: "IMAGE_OPTIONAL_HEADER64", offset: 24, size: 240 },
+    ],
+  },
+];
+
+// Rich Sample Bookmarks
+export const SAMPLE_BOOKMARKS: BookmarkItem[] = [
+  {
+    id: "bm_1",
+    address: 0x140001000,
+    label: "Main Entry Point",
+    color: "#00d4ff",
+    category: "Entry",
+    created_at: "2026-11-09 12:00",
+  },
+  {
+    id: "bm_2",
+    address: 0x140001021,
+    label: "Call to License Check (Key Junction)",
+    color: "#a855f7",
+    category: "Logic",
+    created_at: "2026-11-09 12:05",
+  },
+  {
+    id: "bm_3",
+    address: 0x140001028,
+    label: "License Verification Branch (Patch target)",
+    color: "#ef4444",
+    category: "Branch",
+    created_at: "2026-11-09 12:10",
+  },
+  {
+    id: "bm_4",
+    address: 0x140006070,
+    label: "Embedded Key String",
+    color: "#f59e0b",
+    category: "String",
+    created_at: "2026-11-09 12:15",
+  },
+];

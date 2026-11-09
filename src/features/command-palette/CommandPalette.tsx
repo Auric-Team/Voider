@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Search, Code2, Network, Binary, Layers, FileCode, ArrowRight, X } from "lucide-react";
-import type { FunctionInfo } from "../types/binary";
-import type { WorkbenchView } from "./HeaderBar";
+import type { FunctionInfo } from "../../core/types/binary";
+import type { WorkbenchView } from "../../shared/layout/HeaderBar";
 
 interface CommandPaletteProps {
   isOpen: boolean;

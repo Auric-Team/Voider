@@ -4,7 +4,7 @@ import type {
   StringItem,
   HeaderField,
 } from "../types/binary";
-import { SAMPLE_PE } from "./demoSamples";
+import { SAMPLE_PE } from "../samples/demoSamples";
 
 export async function analyzeFileBuffer(
   buffer: ArrayBuffer,
@@ -113,7 +113,7 @@ export function extractClientStrings(
     }
   }
 
-  return results.slice(0, 500); // cap to 500 strings for speed
+  return results.slice(0, 500);
 }
 
 function parseClientPE(bytes: Uint8Array, filename: string): BinaryAnalysis {
@@ -121,7 +121,6 @@ function parseClientPE(bytes: Uint8Array, filename: string): BinaryAnalysis {
   const entropyBlocks = computeEntropyBlocks(bytes, 24);
   const strings = extractClientStrings(bytes, 4);
 
-  // Return realistic analyzed structure for PE
   return {
     ...SAMPLE_PE,
     info: {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Copy, Check, Code2 } from "lucide-react";
-import type { DecompiledFunction, FunctionInfo } from "../types/binary";
-import { SAMPLE_DECOMPILED } from "../engine/demoSamples";
+import type { DecompiledFunction, FunctionInfo } from "../../core/types/binary";
+import { SAMPLE_DECOMPILED } from "../../core/samples/demoSamples";
 
 interface DecompilerViewProps {
   currentFunction: FunctionInfo | null;
